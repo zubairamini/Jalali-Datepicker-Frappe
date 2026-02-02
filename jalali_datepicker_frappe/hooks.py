@@ -21,6 +21,21 @@ app_license = "gpl-3.0"
 # 	}
 # ]
 
+
+app_include_js = [
+    "/assets/jalali_datepicker_frappe/js/jalalidatepicker.min.js",
+    "/assets/jalali_datepicker_frappe/js/jalali_toggle.js",
+]
+
+app_include_css = [
+    "/assets/jalali_datepicker_frappe/css/jalalidatepicker.min.css",
+    "/assets/jalali_datepicker_frappe/css/jalali_toggle.css",
+]
+
+
+
+
+
 # Includes in <head>
 # ------------------
 

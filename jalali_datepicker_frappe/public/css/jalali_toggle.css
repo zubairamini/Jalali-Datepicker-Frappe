@@ -1,0 +1,42 @@
+.jalali-toggle-btn {
+    position: absolute;
+    right: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    opacity: 0.7;
+    z-index: 1000;
+    background: #f0f0f0;
+    border-radius: 3px;
+    padding: 2px 5px;
+    border: 1px solid #d1d8dd;
+    user-select: none;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.jalali-toggle-btn:hover {
+    opacity: 1;
+    background: #e6e6e6;
+}
+
+.jalali-toggle-btn.active {
+    color: #8b0000;
+    opacity: 1;
+    background: #fff0f0;
+    border-color: #8b0000;
+}
+
+/* Ensure the input field has space for the button */
+.control-input input[data-fieldtype="Date"],
+.control-input input[data-fieldtype="Datetime"] {
+    padding-right: 35px !important;
+}
+
+/* Make sure control-input is positioned relative */
+.control-input {
+    position: relative !important;
+}
