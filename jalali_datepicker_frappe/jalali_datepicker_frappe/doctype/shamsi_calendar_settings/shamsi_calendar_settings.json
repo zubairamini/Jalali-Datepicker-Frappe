@@ -1,0 +1,56 @@
+{
+  "actions": [],
+  "allow_rename": 0,
+  "autoname": "Shamsi Calendar Settings",
+  "creation": "2024-01-01 00:00:00.000000",
+  "doctype": "DocType",
+  "editable_grid": 1,
+  "engine": "InnoDB",
+  "field_order": [
+    "enable_shamsi_calendar",
+    "shamsi_datepicker_format",
+    "shamsi_display_format"
+  ],
+  "fields": [
+    {
+      "default": "0",
+      "fieldname": "enable_shamsi_calendar",
+      "fieldtype": "Check",
+      "label": "Enable Shamsi Calendar"
+    },
+    {
+      "default": "YYYY/MM/DD",
+      "fieldname": "shamsi_datepicker_format",
+      "fieldtype": "Data",
+      "label": "Shamsi Datepicker Format"
+    },
+    {
+      "default": "YYYY/MM/DD",
+      "fieldname": "shamsi_display_format",
+      "fieldtype": "Data",
+      "label": "Shamsi Display Format"
+    }
+  ],
+  "is_single": 1,
+  "links": [],
+  "module": "Jalali Datepicker Frappe",
+  "name": "Shamsi Calendar Settings",
+  "owner": "Administrator",
+  "permissions": [
+    {
+      "create": 1,
+      "delete": 1,
+      "email": 1,
+      "export": 1,
+      "print": 1,
+      "read": 1,
+      "report": 1,
+      "role": "System Manager",
+      "share": 1,
+      "write": 1
+    }
+  ],
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "track_changes": 1
+}

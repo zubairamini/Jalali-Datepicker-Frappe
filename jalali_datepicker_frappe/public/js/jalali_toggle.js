@@ -9,6 +9,8 @@
 let jalali_started = false;
 const JALALI_DATE_REGEX = /^(\d{4})\/(\d{2})\/(\d{2})(?:\s+(\d{2}):(\d{2})(?::(\d{2}))?)?$/;
 const GREGORIAN_DATE_REGEX = /^(\d{4})-(\d{2})-(\d{2})(?:\s+(\d{2}):(\d{2})(?::(\d{2}))?)?$/;
+const DEFAULT_SHAMSI_FORMAT = "YYYY/MM/DD";
+const JALALI_TOGGLE_STORAGE_KEY = "jalali_calendar_enabled";
 
 /* ---------------------------------------------------------------
    JALALI <-> GREGORIAN CONVERSION HELPERS
@@ -130,6 +132,18 @@ function formatJalaliDate(parts) {
     return `${date} ${pad2(parts.hour)}:${pad2(parts.minute)}:${pad2(parts.second || 0)}`;
 }
 
+function formatDateWithPattern(parts, pattern) {
+    const replacements = {
+        YYYY: String(parts.year),
+        MM: pad2(parts.month),
+        DD: pad2(parts.day),
+        HH: pad2(parts.hour ?? 0),
+        mm: pad2(parts.minute ?? 0),
+        ss: pad2(parts.second ?? 0)
+    };
+    return pattern.replace(/YYYY|MM|DD|HH|mm|ss/g, match => replacements[match]);
+}
+
 function convertGregorianToJalali(value) {
     const parsed = parseDateValue(value, GREGORIAN_DATE_REGEX);
     if (!parsed) return null;
@@ -156,6 +170,20 @@ function convertJalaliToGregorian(value) {
         minute: parsed.minute,
         second: parsed.second
     });
+}
+
+function gregorianToShamsi(value) {
+    return convertGregorianToJalali(value);
+}
+
+function shamsiToGregorian(value) {
+    return convertJalaliToGregorian(value);
+}
+
+function formatShamsi(value, format) {
+    const parsed = parseDateValue(value, JALALI_DATE_REGEX);
+    if (!parsed) return value;
+    return formatDateWithPattern(parsed, format || DEFAULT_SHAMSI_FORMAT);
 }
 
 /* ---------------------------------------------------------------
@@ -198,9 +226,11 @@ function updateDualDateDisplay($wrapper, value, isJalali) {
         return;
     }
     const gregorianDisplay = formatGregorianDisplay(values.gregorian);
+    const shamsiFormat = (frappe && frappe.boot && frappe.boot.shamsi_display_format) || DEFAULT_SHAMSI_FORMAT;
+    const shamsiDisplay = formatShamsi(values.jalali, shamsiFormat);
     $display
         .removeClass("is-empty")
-        .text(`Gregorian: ${gregorianDisplay} | Shamsi: ${values.jalali}`);
+        .text(`Gregorian: ${gregorianDisplay} | Shamsi: ${shamsiDisplay}`);
 }
 
 function attachDualDateHandlers(field) {
@@ -333,16 +363,21 @@ function attachConversionHandlersToInput($input) {
 ----------------------------------------------------------------*/
 function shouldEnableJalali() {
     if (!frappe || !frappe.boot) return false;
-    
-    const settings = frappe.boot.jalali_settings || {};
+    const stored = getStoredTogglePreference();
+    if (stored !== null) return stored;
+    return Boolean(frappe.boot.enable_shamsi_calendar);
+}
 
-    if (!settings.enable_jalali) return false;
+function getStoredTogglePreference() {
+    if (!window.localStorage) return null;
+    const value = window.localStorage.getItem(JALALI_TOGGLE_STORAGE_KEY);
+    if (value === null) return null;
+    return value === "true";
+}
 
-    if (settings.auto_enable_by_language) {
-        return ["fa", "ps", "prs"].includes(frappe.boot.lang);
-    }
-
-    return true;
+function setStoredTogglePreference(enabled) {
+    if (!window.localStorage) return;
+    window.localStorage.setItem(JALALI_TOGGLE_STORAGE_KEY, enabled ? "true" : "false");
 }
 
 /* ---------------------------------------------------------------
@@ -388,6 +423,7 @@ function attachJalaliToggle(field) {
         e.stopPropagation();
         
         field._jalali_enabled = !field._jalali_enabled;
+        setStoredTogglePreference(field._jalali_enabled);
         
         if (field._jalali_enabled) {
             $(this).addClass("jalali-on");
@@ -414,6 +450,8 @@ function applyCalendarMode(field) {
     if (field._jalali_enabled) {
         // Enable Jalali
         input.setAttribute("data-jdp", "");
+        const format = (frappe && frappe.boot && frappe.boot.shamsi_datepicker_format) || DEFAULT_SHAMSI_FORMAT;
+        input.setAttribute("data-jdp-format", format);
         input.setAttribute("data-jdp-placement", "top");
         input.setAttribute("data-jdp-show-today-btn", "true");
         input.setAttribute("data-jdp-show-empty-btn", "true");
@@ -584,6 +622,8 @@ function attachToDateFieldsDirectly() {
         if (shouldEnable) {
             $toggleBtn.addClass('jalali-on');
             $input.attr('data-jdp', '');
+            const format = (frappe && frappe.boot && frappe.boot.shamsi_datepicker_format) || DEFAULT_SHAMSI_FORMAT;
+            $input.attr("data-jdp-format", format);
             ensureJalaliStarted();
             attachConversionHandlersToInput($input);
             const jalaliValue = convertGregorianToJalali($input.val());
@@ -610,11 +650,13 @@ function attachToDateFieldsDirectly() {
             
             if (isActive) {
                 $btn.removeClass('jalali-on');
+                setStoredTogglePreference(false);
                 const gregorianValue = convertJalaliToGregorian($input.val());
                 if (gregorianValue) {
                     $input.val(gregorianValue);
                 }
                 $input.removeAttr('data-jdp');
+                $input.removeAttr("data-jdp-format");
                 
                 // Destroy Jalali datepicker if exists
                 if ($input.get(0)._jdp) {
@@ -625,7 +667,10 @@ function attachToDateFieldsDirectly() {
                 $input.trigger('blur').trigger('focus');
             } else {
                 $btn.addClass('jalali-on');
+                setStoredTogglePreference(true);
                 $input.attr('data-jdp', '');
+                const format = (frappe && frappe.boot && frappe.boot.shamsi_datepicker_format) || DEFAULT_SHAMSI_FORMAT;
+                $input.attr("data-jdp-format", format);
                 ensureJalaliStarted();
                 attachConversionHandlersToInput($input);
                 const jalaliValue = convertGregorianToJalali($input.val());
@@ -677,3 +722,72 @@ $(document).ready(function() {
         }
     });
 });
+
+/* ---------------------------------------------------------------
+   FORMATTERS + FILTERS + REPORTS
+----------------------------------------------------------------*/
+function overrideFormatters() {
+    if (!frappe || !frappe.form || !frappe.form.formatters) return;
+    const formatters = frappe.form.formatters;
+    const originalDate = formatters.Date;
+    const originalDatetime = formatters.Datetime;
+
+    formatters.Date = function(value, df, options) {
+        const formatted = originalDate ? originalDate(value, df, options) : value;
+        if (!value || !shouldEnableJalali()) return formatted;
+        const jalali = convertGregorianToJalali(value);
+        if (!jalali) return formatted;
+        const shamsiFormat = (frappe && frappe.boot && frappe.boot.shamsi_display_format) || DEFAULT_SHAMSI_FORMAT;
+        return `${formatted}<br><span class=\"text-muted\">${formatShamsi(jalali, shamsiFormat)}</span>`;
+    };
+
+    formatters.Datetime = function(value, df, options) {
+        const formatted = originalDatetime ? originalDatetime(value, df, options) : value;
+        if (!value || !shouldEnableJalali()) return formatted;
+        const jalali = convertGregorianToJalali(value);
+        if (!jalali) return formatted;
+        const shamsiFormat = (frappe && frappe.boot && frappe.boot.shamsi_display_format) || DEFAULT_SHAMSI_FORMAT;
+        return `${formatted}<br><span class=\"text-muted\">${formatShamsi(jalali, shamsiFormat)}</span>`;
+    };
+}
+
+function overrideFilterConversion() {
+    if (!frappe || !frappe.ui || !frappe.ui.filters || !frappe.ui.filters.Filter) return;
+    const Filter = frappe.ui.filters.Filter;
+    if (Filter.prototype._jalali_get_value_wrapped) return;
+
+    const originalGetValue = Filter.prototype.get_value;
+    Filter.prototype.get_value = function() {
+        const value = originalGetValue.apply(this, arguments);
+        if (!shouldEnableJalali()) return value;
+        if (!["Date", "Datetime"].includes(this.df.fieldtype)) return value;
+        if (typeof value !== "string") return value;
+        const converted = convertJalaliToGregorian(value);
+        return converted || value;
+    };
+    Filter.prototype._jalali_get_value_wrapped = true;
+}
+
+overrideFormatters();
+overrideFilterConversion();
+
+function overrideControls() {
+    if (!frappe || !frappe.ui || !frappe.ui.form) return;
+    const controls = [frappe.ui.form.ControlDate, frappe.ui.form.ControlDatetime];
+    controls.forEach(control => {
+        if (!control || control.prototype._jalali_overridden) return;
+        const originalRefresh = control.prototype.refresh_input;
+        control.prototype.refresh_input = function() {
+            if (originalRefresh) originalRefresh.apply(this, arguments);
+            try {
+                attachJalaliToggle(this);
+                applyCalendarMode(this);
+            } catch (error) {
+                console.error("Jalali toggle refresh failed", error);
+            }
+        };
+        control.prototype._jalali_overridden = true;
+    });
+}
+
+overrideControls();

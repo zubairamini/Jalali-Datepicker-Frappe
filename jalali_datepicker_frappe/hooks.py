@@ -32,6 +32,10 @@ app_include_css = [
     "/assets/jalali_datepicker_frappe/css/jalali_toggle.css",
 ]
 
+boot_session = "jalali_datepicker_frappe.boot.boot_session"
+
+after_install = "jalali_datepicker_frappe.install.after_install"
+
 
 
 
@@ -264,4 +268,3 @@ app_include_css = [
 # ------------
 # List of apps whose translatable strings should be excluded from this app's translations.
 # ignore_translatable_strings_from = []
-
