@@ -116,6 +116,14 @@ function formatGregorianDate(parts) {
     return `${date} ${pad2(parts.hour)}:${pad2(parts.minute)}:${pad2(parts.second || 0)}`;
 }
 
+function formatGregorianDisplay(value) {
+    const parsed = parseDateValue(value, GREGORIAN_DATE_REGEX);
+    if (!parsed) return value;
+    const date = `${pad2(parsed.day)}-${pad2(parsed.month)}-${parsed.year}`;
+    if (parsed.hour === null) return date;
+    return `${date} ${pad2(parsed.hour)}:${pad2(parsed.minute)}:${pad2(parsed.second || 0)}`;
+}
+
 function formatJalaliDate(parts) {
     const date = `${parts.year}/${pad2(parts.month)}/${pad2(parts.day)}`;
     if (parts.hour === null) return date;
@@ -189,9 +197,10 @@ function updateDualDateDisplay($wrapper, value, isJalali) {
         $display.addClass("is-empty");
         return;
     }
+    const gregorianDisplay = formatGregorianDisplay(values.gregorian);
     $display
         .removeClass("is-empty")
-        .text(`Gregorian: ${values.gregorian} | Shamsi: ${values.jalali}`);
+        .text(`Gregorian: ${gregorianDisplay} | Shamsi: ${values.jalali}`);
 }
 
 function attachDualDateHandlers(field) {
