@@ -1,0 +1,216 @@
+/* =========================================================
+   Jalali Calendar UI/UX Override for Frappe Desk
+   Goal: Modern card-like calendar, RTL-friendly, premium states
+   Works best when the calendar root has a wrapper class you control.
+   If not, you can scope to JalaliDatePicker's classes directly.
+   ========================================================= */
+
+/* --- Frappe variable fallbacks --- */
+:root {
+  --jdp-primary: var(--primary, #2563eb);
+  --jdp-text: var(--text-color, #111827);
+  --jdp-muted: var(--text-muted, #6b7280);
+  --jdp-bg: var(--card-bg, #ffffff);
+  --jdp-border: var(--border-color, rgba(17, 24, 39, 0.12));
+  --jdp-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+
+  --jdp-radius: 12px;
+  --jdp-padding: 10px;
+  --jdp-gap: 6px;
+  --jdp-cell: 38px;
+  --jdp-header-h: 44px;
+  --jdp-weekday-h: 28px;
+
+  --jdp-hover: color-mix(in srgb, var(--jdp-primary) 10%, transparent);
+  --jdp-active: color-mix(in srgb, var(--jdp-primary) 16%, transparent);
+  --jdp-focus: color-mix(in srgb, var(--jdp-primary) 25%, transparent);
+}
+
+/* --- Choose ONE scope strategy --- */
+/* Strategy A (recommended): Wrap your calendar popup with a class, e.g. .frappe-jalali-calendar */
+/* Strategy B: Target JalaliDatePicker default classes (if you use that library as-is). */
+
+/* =========================
+   Strategy A: wrapper scope
+   ========================= */
+.frappe-jalali-calendar {
+  direction: rtl;
+  font-family: var(--font-stack, inherit);
+  color: var(--jdp-text);
+}
+
+/* Popup container */
+.frappe-jalali-calendar .jdp-container,
+.frappe-jalali-calendar {
+  width: 312px;
+  background: var(--jdp-bg);
+  border: 1px solid var(--jdp-border);
+  border-radius: var(--jdp-radius);
+  box-shadow: var(--jdp-shadow);
+  padding: var(--jdp-padding);
+  overflow: hidden;
+  z-index: 2000;
+}
+
+/* Header */
+.frappe-jalali-calendar .jdp-header {
+  height: var(--jdp-header-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--jdp-border);
+}
+
+/* Month label */
+.frappe-jalali-calendar .jdp-header .jdp-month {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--jdp-text);
+}
+
+/* Year label / dropdown trigger */
+.frappe-jalali-calendar .jdp-header .jdp-year {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--jdp-muted);
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 10px;
+}
+.frappe-jalali-calendar .jdp-header .jdp-year:hover {
+  background: color-mix(in srgb, var(--jdp-muted) 8%, transparent);
+}
+.frappe-jalali-calendar .jdp-header .jdp-year:active {
+  background: color-mix(in srgb, var(--jdp-muted) 14%, transparent);
+}
+
+/* Nav buttons */
+.frappe-jalali-calendar .jdp-header .jdp-nav-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  user-select: none;
+}
+.frappe-jalali-calendar .jdp-header .jdp-nav-btn:hover {
+  background: color-mix(in srgb, var(--jdp-muted) 8%, transparent);
+}
+.frappe-jalali-calendar .jdp-header .jdp-nav-btn:active {
+  background: color-mix(in srgb, var(--jdp-muted) 14%, transparent);
+}
+
+/* Weekday row */
+.frappe-jalali-calendar .jdp-weekdays {
+  height: var(--jdp-weekday-h);
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  align-items: center;
+  text-align: center;
+  margin-top: 8px;
+  color: var(--jdp-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Day grid */
+.frappe-jalali-calendar .jdp-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--jdp-gap);
+  padding: 8px 4px 4px;
+}
+
+/* Day cell */
+.frappe-jalali-calendar .jdp-day {
+  width: var(--jdp-cell);
+  height: var(--jdp-cell);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+  border: 1px solid transparent;
+  transition: background 120ms ease, transform 120ms ease, border-color 120ms ease;
+}
+
+/* Hover / active feedback */
+.frappe-jalali-calendar .jdp-day:hover {
+  background: var(--jdp-hover);
+}
+.frappe-jalali-calendar .jdp-day:active {
+  background: var(--jdp-active);
+  transform: scale(0.98);
+}
+
+/* Today */
+.frappe-jalali-calendar .jdp-day.is-today {
+  border-color: color-mix(in srgb, var(--jdp-primary) 55%, transparent);
+  background: transparent;
+}
+
+/* Selected */
+.frappe-jalali-calendar .jdp-day.is-selected {
+  background: var(--jdp-primary);
+  color: #fff;
+  border-color: color-mix(in srgb, var(--jdp-primary) 80%, transparent);
+}
+
+/* Disabled / outside month */
+.frappe-jalali-calendar .jdp-day.is-disabled,
+.frappe-jalali-calendar .jdp-day.is-outside {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.frappe-jalali-calendar .jdp-day.is-disabled:hover,
+.frappe-jalali-calendar .jdp-day.is-outside:hover {
+  background: transparent;
+  transform: none;
+}
+
+/* Focus ring (keyboard accessibility) */
+.frappe-jalali-calendar .jdp-day:focus-visible,
+.frappe-jalali-calendar .jdp-nav-btn:focus-visible,
+.frappe-jalali-calendar .jdp-year:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--jdp-focus);
+  border-color: color-mix(in srgb, var(--jdp-primary) 35%, transparent);
+}
+
+/* Popup animation */
+.frappe-jalali-calendar {
+  transform-origin: top right;
+  animation: jdp-pop 140ms ease-out;
+}
+@keyframes jdp-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* =========================
+   Strategy B: direct JalaliDatePicker class targeting
+   (If the lib uses its own classes; adjust names to match actual DOM)
+   ========================= */
+/*
+.jalali-datepicker,
+.jdp {
+  direction: rtl;
+  ... same as above ...
+}
+*/
