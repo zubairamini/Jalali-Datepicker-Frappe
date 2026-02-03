@@ -151,6 +151,73 @@ function convertJalaliToGregorian(value) {
 }
 
 /* ---------------------------------------------------------------
+   DUAL DATE DISPLAY (JALALI + GREGORIAN)
+----------------------------------------------------------------*/
+function ensureDualDateElement($wrapper) {
+    if (!$wrapper || !$wrapper.length) return null;
+    let $display = $wrapper.find(".jalali-dual-date");
+    if ($display.length) return $display;
+
+    $display = $('<div class="jalali-dual-date" aria-live="polite"></div>');
+    const $controlInput = $wrapper.find(".control-input");
+    if ($controlInput.length) {
+        $controlInput.after($display);
+    } else {
+        $wrapper.append($display);
+    }
+    return $display;
+}
+
+function getDualDateValues(value, isJalali) {
+    if (!value) return null;
+    if (isJalali) {
+        const gregorian = convertJalaliToGregorian(value);
+        if (!gregorian) return null;
+        return { gregorian, jalali: value };
+    }
+    const jalali = convertGregorianToJalali(value);
+    if (!jalali) return null;
+    return { gregorian: value, jalali };
+}
+
+function updateDualDateDisplay($wrapper, value, isJalali) {
+    const $display = ensureDualDateElement($wrapper);
+    if (!$display) return;
+    const values = getDualDateValues(value, isJalali);
+    if (!values) {
+        $display.text("");
+        $display.addClass("is-empty");
+        return;
+    }
+    $display
+        .removeClass("is-empty")
+        .text(`Gregorian: ${values.gregorian} | Shamsi: ${values.jalali}`);
+}
+
+function attachDualDateHandlers(field) {
+    if (!field || !field.$input || !field.$wrapper) return;
+    if (field._jalali_dual_attached) return;
+    field._jalali_dual_attached = true;
+
+    const $input = field.$input;
+    const $wrapper = field.$wrapper;
+
+    const update = () => {
+        updateDualDateDisplay($wrapper, $input.val(), field._jalali_enabled);
+    };
+
+    $input.on("jdp:change change blur input", update);
+    field._jalali_dual_update = update;
+    update();
+}
+
+function updateDualDateForField(field) {
+    if (field && typeof field._jalali_dual_update === "function") {
+        field._jalali_dual_update();
+    }
+}
+
+/* ---------------------------------------------------------------
    START JALALI DATEPICKER ONLY ONCE
 ----------------------------------------------------------------*/
 function ensureJalaliStarted() {
@@ -284,9 +351,9 @@ function attachJalaliToggle(field) {
     
     // Create toggle button
     const toggleBtn = $(`
-        <span class="jalali-toggle-btn"
-              title="Toggle Jalali / Gregorian">
-            🇮🇷
+        <span class="jalali-toggle-btn" title="Toggle Jalali / Gregorian" role="button">
+            <span class="jalali-toggle-option jalali">Shamsi</span>
+            <span class="jalali-toggle-option gregorian">Gregorian</span>
         </span>
     `);
 
@@ -301,10 +368,9 @@ function attachJalaliToggle(field) {
     // Set initial state from system settings
     field._jalali_enabled = shouldEnableJalali();
     if (field._jalali_enabled) {
-        toggleBtn.addClass("active");
-        toggleBtn.text("🇮🇷"); // Jalali icon
+        toggleBtn.addClass("jalali-on");
     } else {
-        toggleBtn.text("🌍"); // Gregorian icon
+        toggleBtn.removeClass("jalali-on");
     }
 
     // Toggle click handler
@@ -315,13 +381,16 @@ function attachJalaliToggle(field) {
         field._jalali_enabled = !field._jalali_enabled;
         
         if (field._jalali_enabled) {
-            $(this).addClass("active").text("🇮🇷");
+            $(this).addClass("jalali-on");
         } else {
-            $(this).removeClass("active").text("🌍");
+            $(this).removeClass("jalali-on");
         }
         
         applyCalendarMode(field);
+        updateDualDateForField(field);
     });
+
+    attachDualDateHandlers(field);
 }
 
 /* ---------------------------------------------------------------
@@ -373,6 +442,8 @@ function applyCalendarMode(field) {
             field.refresh_input();
         }
     }
+
+    updateDualDateForField(field);
 }
 
 /* ---------------------------------------------------------------
@@ -481,9 +552,9 @@ function attachToDateFieldsDirectly() {
         
         // Create toggle button
         const $toggleBtn = $(`
-            <span class="jalali-toggle-btn"
-                  title="Toggle Jalali / Gregorian">
-                🇮🇷
+            <span class="jalali-toggle-btn" title="Toggle Jalali / Gregorian" role="button">
+                <span class="jalali-toggle-option jalali">Shamsi</span>
+                <span class="jalali-toggle-option gregorian">Gregorian</span>
             </span>
         `);
         
@@ -502,7 +573,7 @@ function attachToDateFieldsDirectly() {
         const shouldEnable = shouldEnableJalali();
         
         if (shouldEnable) {
-            $toggleBtn.addClass('active').text('🇮🇷');
+            $toggleBtn.addClass('jalali-on');
             $input.attr('data-jdp', '');
             ensureJalaliStarted();
             attachConversionHandlersToInput($input);
@@ -511,19 +582,25 @@ function attachToDateFieldsDirectly() {
                 $input.val(jalaliValue);
             }
         } else {
-            $toggleBtn.text('🌍');
+            $toggleBtn.removeClass('jalali-on');
         }
+
+        const updateDual = () => {
+            updateDualDateDisplay($wrapper, $input.val(), $toggleBtn.hasClass("jalali-on"));
+        };
+        $input.on("jdp:change change blur input", updateDual);
+        updateDual();
         
         // Add click handler
         $toggleBtn.on('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
             
-            const isActive = $(this).hasClass('active');
+            const isActive = $(this).hasClass('jalali-on');
             const $btn = $(this);
             
             if (isActive) {
-                $btn.removeClass('active').text('🌍');
+                $btn.removeClass('jalali-on');
                 const gregorianValue = convertJalaliToGregorian($input.val());
                 if (gregorianValue) {
                     $input.val(gregorianValue);
@@ -538,7 +615,7 @@ function attachToDateFieldsDirectly() {
                 // Try to trigger Frappe's default datepicker
                 $input.trigger('blur').trigger('focus');
             } else {
-                $btn.addClass('active').text('🇮🇷');
+                $btn.addClass('jalali-on');
                 $input.attr('data-jdp', '');
                 ensureJalaliStarted();
                 attachConversionHandlersToInput($input);
@@ -552,6 +629,8 @@ function attachToDateFieldsDirectly() {
                     window.jalaliDatepicker.update($input.get(0));
                 }
             }
+
+            updateDual();
         });
     });
 }
