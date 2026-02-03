@@ -2,12 +2,11 @@
     position: absolute;
     right: 8px;
     cursor: pointer;
-    font-size: 14px;
-    opacity: 0.7;
+    font-size: 12px;
     z-index: 1000;
-    background: #f0f0f0;
-    border-radius: 3px;
-    padding: 2px 5px;
+    background: #f5f5f5;
+    border-radius: 12px;
+    padding: 2px;
     border: 1px solid #d1d8dd;
     user-select: none;
     height: 28px;
@@ -16,27 +15,49 @@
     justify-content: center;
     top: 50%;
     transform: translateY(-50%);
+    gap: 2px;
+}
+
+.jalali-toggle-option {
+    padding: 2px 6px;
+    border-radius: 10px;
+    color: #6c7680;
+    font-weight: 600;
+    line-height: 1;
+    transition: background 0.2s ease, color 0.2s ease;
 }
 
 .jalali-toggle-btn:hover {
-    opacity: 1;
-    background: #e6e6e6;
+    background: #e9ecef;
 }
 
-.jalali-toggle-btn.active {
-    color: #8b0000;
-    opacity: 1;
+.jalali-toggle-btn.jalali-on .jalali-toggle-option.jalali {
     background: #fff0f0;
-    border-color: #8b0000;
+    color: #8b0000;
+}
+
+.jalali-toggle-btn:not(.jalali-on) .jalali-toggle-option.gregorian {
+    background: #f0f7ff;
+    color: #0d6efd;
 }
 
 /* Ensure the input field has space for the button */
 .control-input input[data-fieldtype="Date"],
 .control-input input[data-fieldtype="Datetime"] {
-    padding-right: 35px !important;
+    padding-right: 120px !important;
 }
 
 /* Make sure control-input is positioned relative */
 .control-input {
     position: relative !important;
+}
+
+.jalali-dual-date {
+    margin-top: 4px;
+    font-size: 11px;
+    color: #6c7680;
+}
+
+.jalali-dual-date.is-empty {
+    display: none;
 }
