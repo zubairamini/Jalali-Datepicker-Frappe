@@ -1,0 +1,60 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-06-12 12:07:22.686027",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "islamic_date_setting_section",
+  "islamic_date_format",
+  "islamic_date_datepicker_format"
+ ],
+ "fields": [
+  {
+   "fieldname": "islamic_date_setting_section",
+   "fieldtype": "Section Break",
+   "label": "Islamic Date Setting"
+  },
+  {
+   "default": "mm-dd-yyyy",
+   "fieldname": "islamic_date_format",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Print Format",
+   "options": "mm-dd-yyyy\ndd-mm-yyyy\ndd-MM-yyyy\ndd-M-yyyy\ndd-M-yy\nd/M/yyyy\nD, dd M yyyy\nDD, dd MM yyyy\nM d, yyyy\nMM d, yyyy\ndd-MM-yy\nd/M/yy\ndd/MM/yyyy\nmm/dd/yyyy",
+   "reqd": 1
+  },
+  {
+   "default": "mm-dd-yyyy",
+   "fieldname": "islamic_date_datepicker_format",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Datepicker Format",
+   "options": "mm-dd-yyyy\ndd-mm-yyyy\ndd-MM-yyyy\ndd-M-yyyy\ndd-M-yy\nd/M/yyyy\nD, dd M yyyy\nDD, dd MM yyyy\nM d, yyyy\nMM d, yyyy\ndd-MM-yy\nd/M/yy\ndd/MM/yyyy\nmm/dd/yyyy",
+   "reqd": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2024-06-12 12:09:59.424433",
+ "modified_by": "Administrator",
+ "module": "Islamic Calendar",
+ "name": "Islamic Date Setting",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
