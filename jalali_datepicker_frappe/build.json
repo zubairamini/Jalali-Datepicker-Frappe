@@ -1,0 +1,10 @@
+{
+  "scripts": [
+    "public/js/jalalidatepicker.min.js",
+    "public/js/jalali_toggle.js"
+  ],
+  "styles": [
+    "public/css/jalalidatepicker.min.css",
+    "public/css/jalali_toggle.css"
+  ]
+}
