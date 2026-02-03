@@ -7,6 +7,148 @@
    GLOBAL STATE
 ----------------------------------------------------------------*/
 let jalali_started = false;
+const JALALI_DATE_REGEX = /^(\d{4})\/(\d{2})\/(\d{2})(?:\s+(\d{2}):(\d{2})(?::(\d{2}))?)?$/;
+const GREGORIAN_DATE_REGEX = /^(\d{4})-(\d{2})-(\d{2})(?:\s+(\d{2}):(\d{2})(?::(\d{2}))?)?$/;
+
+/* ---------------------------------------------------------------
+   JALALI <-> GREGORIAN CONVERSION HELPERS
+----------------------------------------------------------------*/
+function div(a, b) {
+    return Math.floor(a / b);
+}
+
+function toJalali(gy, gm, gd) {
+    const g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+    let jy = gy > 1600 ? 979 : 0;
+    gy -= gy > 1600 ? 1600 : 621;
+    const gy2 = gm > 2 ? gy + 1 : gy;
+    let days =
+        365 * gy +
+        div(gy2 + 3, 4) -
+        div(gy2 + 99, 100) +
+        div(gy2 + 399, 400) -
+        80 +
+        gd +
+        g_d_m[gm - 1];
+    jy += 33 * div(days, 12053);
+    days %= 12053;
+    jy += 4 * div(days, 1461);
+    days %= 1461;
+    if (days > 365) {
+        jy += div(days - 1, 365);
+        days = (days - 1) % 365;
+    }
+    const jm = days < 186 ? 1 + div(days, 31) : 7 + div(days - 186, 30);
+    const jd = 1 + (days < 186 ? days % 31 : (days - 186) % 30);
+    return { jy, jm, jd };
+}
+
+function toGregorian(jy, jm, jd) {
+    let gy = jy > 979 ? 1600 : 621;
+    jy -= jy > 979 ? 979 : 0;
+    let days =
+        365 * jy +
+        div(jy, 33) * 8 +
+        div((jy % 33) + 3, 4) +
+        78 +
+        jd +
+        (jm < 7 ? (jm - 1) * 31 : (jm - 7) * 30 + 186);
+    gy += 400 * div(days, 146097);
+    days %= 146097;
+    if (days > 36524) {
+        gy += 100 * div(--days, 36524);
+        days %= 36524;
+        if (days >= 365) {
+            days += 1;
+        }
+    }
+    gy += 4 * div(days, 1461);
+    days %= 1461;
+    if (days > 365) {
+        gy += div(days - 1, 365);
+        days = (days - 1) % 365;
+    }
+    let gd = days + 1;
+    const sal_a = [
+        0,
+        31,
+        (gy % 4 === 0 && gy % 100 !== 0) || gy % 400 === 0 ? 29 : 28,
+        31,
+        30,
+        31,
+        30,
+        31,
+        31,
+        30,
+        31,
+        30,
+        31
+    ];
+    let gm = 0;
+    for (gm = 1; gm <= 12; gm++) {
+        if (gd <= sal_a[gm]) break;
+        gd -= sal_a[gm];
+    }
+    return { gy, gm, gd };
+}
+
+function pad2(value) {
+    return String(value).padStart(2, "0");
+}
+
+function parseDateValue(value, regex) {
+    if (!value || typeof value !== "string") return null;
+    const match = value.trim().match(regex);
+    if (!match) return null;
+    return {
+        year: parseInt(match[1], 10),
+        month: parseInt(match[2], 10),
+        day: parseInt(match[3], 10),
+        hour: match[4] ? parseInt(match[4], 10) : null,
+        minute: match[5] ? parseInt(match[5], 10) : null,
+        second: match[6] ? parseInt(match[6], 10) : null
+    };
+}
+
+function formatGregorianDate(parts) {
+    const date = `${parts.year}-${pad2(parts.month)}-${pad2(parts.day)}`;
+    if (parts.hour === null) return date;
+    return `${date} ${pad2(parts.hour)}:${pad2(parts.minute)}:${pad2(parts.second || 0)}`;
+}
+
+function formatJalaliDate(parts) {
+    const date = `${parts.year}/${pad2(parts.month)}/${pad2(parts.day)}`;
+    if (parts.hour === null) return date;
+    return `${date} ${pad2(parts.hour)}:${pad2(parts.minute)}:${pad2(parts.second || 0)}`;
+}
+
+function convertGregorianToJalali(value) {
+    const parsed = parseDateValue(value, GREGORIAN_DATE_REGEX);
+    if (!parsed) return null;
+    const { jy, jm, jd } = toJalali(parsed.year, parsed.month, parsed.day);
+    return formatJalaliDate({
+        year: jy,
+        month: jm,
+        day: jd,
+        hour: parsed.hour,
+        minute: parsed.minute,
+        second: parsed.second
+    });
+}
+
+function convertJalaliToGregorian(value) {
+    const parsed = parseDateValue(value, JALALI_DATE_REGEX);
+    if (!parsed) return null;
+    const { gy, gm, gd } = toGregorian(parsed.year, parsed.month, parsed.day);
+    return formatGregorianDate({
+        year: gy,
+        month: gm,
+        day: gd,
+        hour: parsed.hour,
+        minute: parsed.minute,
+        second: parsed.second
+    });
+}
 
 /* ---------------------------------------------------------------
    START JALALI DATEPICKER ONLY ONCE
@@ -25,6 +167,89 @@ function ensureJalaliStarted() {
     });
 
     jalali_started = true;
+}
+
+/* ---------------------------------------------------------------
+   CONVERSION HANDLERS FOR FIELDS
+----------------------------------------------------------------*/
+function syncDisplayToJalali(field) {
+    if (!field || !field.$input) return;
+    const input = field.$input.get(0);
+    if (!input || !input.value) return;
+    const jalaliValue = convertGregorianToJalali(input.value);
+    if (jalaliValue) {
+        input.value = jalaliValue;
+    }
+}
+
+function syncDisplayToGregorian(field) {
+    if (!field || !field.$input) return;
+    const input = field.$input.get(0);
+    if (!input || !input.value) return;
+    const gregorianValue = convertJalaliToGregorian(input.value);
+    if (gregorianValue) {
+        input.value = gregorianValue;
+    }
+}
+
+function attachConversionHandlers(field) {
+    if (!field || !field.$input) return;
+    if (field._jalali_conversion_attached) return;
+
+    field._jalali_conversion_attached = true;
+    const $input = field.$input;
+
+    const handler = () => {
+        if (!field._jalali_enabled) return;
+        const rawValue = $input.val();
+        if (!rawValue) {
+            field.set_value("");
+            return;
+        }
+        const gregorianValue = convertJalaliToGregorian(rawValue);
+        if (!gregorianValue) return;
+
+        if (field._jalali_syncing) return;
+        field._jalali_syncing = true;
+        Promise.resolve(field.set_value(gregorianValue))
+            .then(() => {
+                if (field._jalali_enabled) {
+                    $input.val(rawValue);
+                }
+            })
+            .finally(() => {
+                field._jalali_syncing = false;
+            });
+    };
+
+    $input.on("jdp:change", handler);
+    $input.on("change", handler);
+    $input.on("blur", handler);
+}
+
+function attachConversionHandlersToInput($input) {
+    if (!$input || !$input.length) return;
+    const input = $input.get(0);
+    if (!input || input._jalali_conversion_attached) return;
+
+    input._jalali_conversion_attached = true;
+    $input.on("jdp:change change blur", () => {
+        if (!input.hasAttribute("data-jdp")) return;
+        if (input._jalali_syncing) return;
+        const jalaliValue = input.value;
+        if (!jalaliValue) return;
+        const gregorianValue = convertJalaliToGregorian(jalaliValue);
+        if (!gregorianValue) return;
+        input._jalali_syncing = true;
+        input.value = gregorianValue;
+        $input.trigger("change");
+        setTimeout(() => {
+            if (input.hasAttribute("data-jdp")) {
+                input.value = jalaliValue;
+            }
+            input._jalali_syncing = false;
+        }, 0);
+    });
 }
 
 /* ---------------------------------------------------------------
@@ -116,8 +341,10 @@ function applyCalendarMode(field) {
         input.setAttribute("data-jdp-show-empty-btn", "true");
         input.setAttribute("data-jdp-persian-digits", "false");
         input.setAttribute("data-jdp-auto-hide", "true");
-        
+
         ensureJalaliStarted();
+        attachConversionHandlers(field);
+        syncDisplayToJalali(field);
         
         // Initialize or reinitialize the datepicker
         if (window.jalaliDatepicker && window.jalaliDatepicker.update) {
@@ -127,6 +354,7 @@ function applyCalendarMode(field) {
         }
     } else {
         // Disable Jalali - switch to default
+        syncDisplayToGregorian(field);
         input.removeAttribute("data-jdp");
         input.removeAttribute("data-jdp-placement");
         input.removeAttribute("data-jdp-show-today-btn");
@@ -277,6 +505,11 @@ function attachToDateFieldsDirectly() {
             $toggleBtn.addClass('active').text('🇮🇷');
             $input.attr('data-jdp', '');
             ensureJalaliStarted();
+            attachConversionHandlersToInput($input);
+            const jalaliValue = convertGregorianToJalali($input.val());
+            if (jalaliValue) {
+                $input.val(jalaliValue);
+            }
         } else {
             $toggleBtn.text('🌍');
         }
@@ -291,6 +524,10 @@ function attachToDateFieldsDirectly() {
             
             if (isActive) {
                 $btn.removeClass('active').text('🌍');
+                const gregorianValue = convertJalaliToGregorian($input.val());
+                if (gregorianValue) {
+                    $input.val(gregorianValue);
+                }
                 $input.removeAttr('data-jdp');
                 
                 // Destroy Jalali datepicker if exists
@@ -304,6 +541,11 @@ function attachToDateFieldsDirectly() {
                 $btn.addClass('active').text('🇮🇷');
                 $input.attr('data-jdp', '');
                 ensureJalaliStarted();
+                attachConversionHandlersToInput($input);
+                const jalaliValue = convertGregorianToJalali($input.val());
+                if (jalaliValue) {
+                    $input.val(jalaliValue);
+                }
                 
                 // Update the datepicker
                 if (window.jalaliDatepicker && window.jalaliDatepicker.update) {
