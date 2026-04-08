@@ -94,7 +94,6 @@ frappe.ui.form.ControlDate = class CustomControlDate extends frappe.ui.form.Cont
         this.$wrapper.on('click', '.isd_switch_btn', (ev) => {
                 ev.preventDefault();
                 ev.stopPropagation();
-                if (!this.can_write()) { return; }
                 this.datepicker_ism = !this.datepicker_ism;
                 this._toggleDatepicker();
         });
@@ -132,14 +131,7 @@ frappe.ui.form.ControlDate = class CustomControlDate extends frappe.ui.form.Cont
         if (!value) {
             return '&nbsp;';
         }
-        const formattedGregorian = this.format_for_input(value) || '&nbsp;';
-        const dateType = this.df.fieldtype === 'Datetime' ? TYPE_DATETIME : TYPE_DATE;
-        const selectedDate = moment(value, this.date_format);
-        const formattedShamsi = ad2ism(selectedDate, dateType, ISM_DATE_FORMAT_USER);
-        if (!formattedShamsi) {
-            return formattedGregorian;
-        }
-        return `${formattedGregorian}<br />${formattedShamsi}`;
+        return this.format_for_input(value) || '&nbsp;';
     }
     islamic_make_picker(){
         $(this.$ismInput).removeAttr('readonly');
@@ -202,7 +194,7 @@ frappe.ui.form.ControlDate = class CustomControlDate extends frappe.ui.form.Cont
             if (!value) {
                 this.$wrapper.find('.islamic_date-conversion').html('&nbsp;');
             } else if (!this.can_write()) {
-                this.$wrapper.find('.islamic_date-conversion').html('&nbsp;');
+                this.$wrapper.find('.islamic_date-conversion').html(this.format_for_input(value));
             } else {
                 if (this.datepicker_ism) {
                     this.$wrapper.find('.islamic_date-conversion').html(this.format_for_input(value));
@@ -231,11 +223,15 @@ frappe.ui.form.ControlDate = class CustomControlDate extends frappe.ui.form.Cont
     }
     refresh() {
         super.refresh();
-        this._toggleDatepicker();
         if (!this.can_write()) {
             this._setReadOnlyDisplayValue();
         }
         this._printDateConversion();
+        if (!this.can_write()) {
+            this._setReadOnlyDisplayValue();
+        }
+        this._printDateConversion();
+        this.$wrapper.find('.isd_switch_btn').css('display', 'block');
     }
 }
 
@@ -276,7 +272,6 @@ frappe.ui.form.ControlDatetime = class CustomControlDateDate extends frappe.ui.f
         this.$wrapper.on('click', '.isd_switch_btn', (ev) => {
                 ev.preventDefault();
                 ev.stopPropagation();
-                if (!this.can_write()) { return; }
                 this.datepicker_ism = !this.datepicker_ism;
                 this._toggleDatepicker();
         });
@@ -314,14 +309,7 @@ frappe.ui.form.ControlDatetime = class CustomControlDateDate extends frappe.ui.f
         if (!value) {
             return '&nbsp;';
         }
-        const formattedGregorian = this.format_for_input(value) || '&nbsp;';
-        const dateType = this.df.fieldtype === 'Datetime' ? TYPE_DATETIME : TYPE_DATE;
-        const selectedDate = moment(value, this.date_format);
-        const formattedShamsi = ad2ism(selectedDate, dateType, ISM_DATE_FORMAT_USER);
-        if (!formattedShamsi) {
-            return formattedGregorian;
-        }
-        return `${formattedGregorian}<br />${formattedShamsi}`;
+        return this.format_for_input(value) || '&nbsp;';
     }
     islamic_make_picker(){
         $(this.$ismInput).removeAttr('readonly');
@@ -384,7 +372,7 @@ frappe.ui.form.ControlDatetime = class CustomControlDateDate extends frappe.ui.f
             if (!value) {
                 this.$wrapper.find('.islamic_date-conversion').html('&nbsp;');
             } else if (!this.can_write()) {
-                this.$wrapper.find('.islamic_date-conversion').html('&nbsp;');
+                this.$wrapper.find('.islamic_date-conversion').html(this.format_for_input(value));
             } else {
                 if (this.datepicker_ism) {
                     this.$wrapper.find('.islamic_date-conversion').html(this.format_for_input(value));
@@ -413,11 +401,15 @@ frappe.ui.form.ControlDatetime = class CustomControlDateDate extends frappe.ui.f
     }
     refresh() {
         super.refresh();
-        this._toggleDatepicker();
         if (!this.can_write()) {
             this._setReadOnlyDisplayValue();
         }
         this._printDateConversion();
+        if (!this.can_write()) {
+            this._setReadOnlyDisplayValue();
+        }
+        this._printDateConversion();
+        this.$wrapper.find('.isd_switch_btn').css('display', 'block');
     }
 }
 
