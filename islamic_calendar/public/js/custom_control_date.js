@@ -106,7 +106,7 @@ frappe.ui.form.ControlDate = class CustomControlDate extends frappe.ui.form.Cont
             this._setReadOnlyDisplayValue($controlValue);
             this.$input.addClass('hide');
             this.$ismInput.addClass('hide');
-            this.$wrapper.find('.isd_switch_btn').hide();
+            this.$wrapper.find('.isd_switch_btn').show();
             this._printDateConversion();
             return;
         }
@@ -191,11 +191,6 @@ frappe.ui.form.ControlDate = class CustomControlDate extends frappe.ui.form.Cont
                 dateType = TYPE_DATETIME;
             }
 
-            if (!this.can_write()) {
-                this.$wrapper.find('.islamic_date-conversion').html('&nbsp;');
-                return;
-            }
-
             if (!value) {
                 this.$wrapper.find('.islamic_date-conversion').html('&nbsp;');
             } else {
@@ -231,10 +226,10 @@ frappe.ui.form.ControlDate = class CustomControlDate extends frappe.ui.form.Cont
         }
         this._printDateConversion();
         if (!this.can_write()) {
-            this.$wrapper.find('.isd_switch_btn').css('display', 'none');
-        } else {
-            this.$wrapper.find('.isd_switch_btn').css('display', 'block');
+            this._setReadOnlyDisplayValue();
         }
+        this._printDateConversion();
+        this.$wrapper.find('.isd_switch_btn').css('display', 'block');
     }
 }
 
@@ -287,7 +282,7 @@ frappe.ui.form.ControlDatetime = class CustomControlDateDate extends frappe.ui.f
             this._setReadOnlyDisplayValue($controlValue);
             this.$input.addClass('hide');
             this.$ismInput.addClass('hide');
-            this.$wrapper.find('.isd_switch_btn').hide();
+            this.$wrapper.find('.isd_switch_btn').show();
             this._printDateConversion();
             return;
         }
@@ -372,11 +367,6 @@ frappe.ui.form.ControlDatetime = class CustomControlDateDate extends frappe.ui.f
                 dateType = TYPE_DATETIME;
             }
 
-            if (!this.can_write()) {
-                this.$wrapper.find('.islamic_date-conversion').html('&nbsp;');
-                return;
-            }
-
             if (!value) {
                 this.$wrapper.find('.islamic_date-conversion').html('&nbsp;');
             } else {
@@ -412,10 +402,10 @@ frappe.ui.form.ControlDatetime = class CustomControlDateDate extends frappe.ui.f
         }
         this._printDateConversion();
         if (!this.can_write()) {
-            this.$wrapper.find('.isd_switch_btn').css('display', 'none');
-        } else {
-            this.$wrapper.find('.isd_switch_btn').css('display', 'block');
+            this._setReadOnlyDisplayValue();
         }
+        this._printDateConversion();
+        this.$wrapper.find('.isd_switch_btn').css('display', 'block');
     }
 }
 
