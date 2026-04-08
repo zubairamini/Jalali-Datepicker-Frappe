@@ -2613,6 +2613,13 @@
     }
     return getISMCalendar().fromJSDate(adDate);
   }
+  function getParsedMoment(value2) {
+    const parsedFromFrappe = moment(frappe.datetime.str_to_obj(value2));
+    if (parsedFromFrappe.isValid()) {
+      return parsedFromFrappe;
+    }
+    return moment(value2);
+  }
   function FormatFormDate(value2) {
     frappe.datetime.str_to_user = datetime_str_to_user;
     const formatted = frappeDateFormatter(value2);
@@ -2670,8 +2677,11 @@
     }
     bind_events() {
       this.$wrapper.on("click", ".isd_switch_btn", (ev) => {
-        event.preventDefault();
-        event.stopPropagation();
+        ev.preventDefault();
+        ev.stopPropagation();
+        if (!this.can_write()) {
+          return;
+        }
         this.datepicker_ism = !this.datepicker_ism;
         this._toggleDatepicker();
       });
@@ -2680,6 +2690,17 @@
       if (!this.$ismInput || !this.$ismInput.length) {
         return;
       }
+      const $controlValue = this.$wrapper.find(".control-value");
+      if (!this.can_write()) {
+        this._setReadOnlyDisplayValue($controlValue);
+        this.$input.addClass("hide");
+        this.$ismInput.addClass("hide");
+        this.$wrapper.find(".isd_switch_btn").show();
+        this._printDateConversion();
+        return;
+      }
+      $controlValue.hide();
+      this.$wrapper.find(".isd_switch_btn").show();
       if (this.datepicker_ism === true) {
         this.$ismInput.removeClass("hide");
         this.$input.addClass("hide");
@@ -2688,6 +2709,23 @@
         this.$ismInput.addClass("hide");
       }
       this._printDateConversion();
+    }
+    _setReadOnlyDisplayValue($controlValue = this.$wrapper.find(".control-value")) {
+      $controlValue.html(this._getReadOnlyDisplayValue()).show();
+    }
+    _getReadOnlyDisplayValue() {
+      const value2 = this.get_value();
+      if (!value2) {
+        return "&nbsp;";
+      }
+      const formattedGregorian = this.format_for_input(value2) || "&nbsp;";
+      const dateType = this.df.fieldtype === "Datetime" ? TYPE_DATETIME : TYPE_DATE;
+      const selectedDate = getParsedMoment(value2);
+      const formattedShamsi = ad2ism(selectedDate, dateType, ISM_DATE_FORMAT_USER);
+      if (!formattedShamsi) {
+        return formattedGregorian;
+      }
+      return `${formattedGregorian}<br />${formattedShamsi}`;
     }
     islamic_make_picker() {
       $(this.$ismInput).removeAttr("readonly");
@@ -2744,21 +2782,17 @@
       } else if (this.df.fieldtype === "Datetime") {
         dateType = TYPE_DATETIME;
       }
-      if (!this.can_write()) {
-        this.$wrapper.find(".islamic_date-conversion").html("&nbsp;");
-        return;
-      }
       if (!value2) {
         this.$wrapper.find(".islamic_date-conversion").html("&nbsp;");
+      } else if (!this.can_write()) {
+        this.$wrapper.find(".islamic_date-conversion").html("&nbsp;");
+      } else if (this.datepicker_ism) {
+        this.$wrapper.find(".islamic_date-conversion").html(this.format_for_input(value2));
       } else {
-        if (this.datepicker_ism) {
-          this.$wrapper.find(".islamic_date-conversion").html(this.format_for_input(value2));
-        } else {
-          const selectedDate = moment(value2, this.date_format);
-          this.$wrapper.find(".islamic_date-conversion").html(
-            ad2ism(selectedDate, dateType, ISM_DATE_FORMAT_USER)
-          );
-        }
+        const selectedDate = getParsedMoment(value2);
+        this.$wrapper.find(".islamic_date-conversion").html(
+          ad2ism(selectedDate, dateType, ISM_DATE_FORMAT_USER)
+        );
       }
     }
     set_formatted_input(value2) {
@@ -2769,17 +2803,19 @@
       } else {
         this.$ismInput.val("");
       }
+      if (!this.can_write()) {
+        this._setReadOnlyDisplayValue();
+      }
       this._printDateConversion();
       return spset;
     }
     refresh() {
       super.refresh();
-      this._printDateConversion();
+      this._toggleDatepicker();
       if (!this.can_write()) {
-        this.$wrapper.find(".ism_switch_btn").css("display", "none");
-      } else {
-        this.$wrapper.find(".ism_switch_btn").css("display", "block");
+        this._setReadOnlyDisplayValue();
       }
+      this._printDateConversion();
     }
   };
   frappe.ui.form.ControlDatetime = class CustomControlDateDate extends frappe.ui.form.ControlDatetime {
@@ -2817,8 +2853,11 @@
     }
     bind_events() {
       this.$wrapper.on("click", ".isd_switch_btn", (ev) => {
-        event.preventDefault();
-        event.stopPropagation();
+        ev.preventDefault();
+        ev.stopPropagation();
+        if (!this.can_write()) {
+          return;
+        }
         this.datepicker_ism = !this.datepicker_ism;
         this._toggleDatepicker();
       });
@@ -2827,6 +2866,17 @@
       if (!this.$ismInput || !this.$ismInput.length) {
         return;
       }
+      const $controlValue = this.$wrapper.find(".control-value");
+      if (!this.can_write()) {
+        this._setReadOnlyDisplayValue($controlValue);
+        this.$input.addClass("hide");
+        this.$ismInput.addClass("hide");
+        this.$wrapper.find(".isd_switch_btn").show();
+        this._printDateConversion();
+        return;
+      }
+      $controlValue.hide();
+      this.$wrapper.find(".isd_switch_btn").show();
       if (this.datepicker_ism === true) {
         this.$ismInput.removeClass("hide");
         this.$input.addClass("hide");
@@ -2835,6 +2885,23 @@
         this.$ismInput.addClass("hide");
       }
       this._printDateConversion();
+    }
+    _setReadOnlyDisplayValue($controlValue = this.$wrapper.find(".control-value")) {
+      $controlValue.html(this._getReadOnlyDisplayValue()).show();
+    }
+    _getReadOnlyDisplayValue() {
+      const value2 = this.get_value();
+      if (!value2) {
+        return "&nbsp;";
+      }
+      const formattedGregorian = this.format_for_input(value2) || "&nbsp;";
+      const dateType = this.df.fieldtype === "Datetime" ? TYPE_DATETIME : TYPE_DATE;
+      const selectedDate = getParsedMoment(value2);
+      const formattedShamsi = ad2ism(selectedDate, dateType, ISM_DATE_FORMAT_USER);
+      if (!formattedShamsi) {
+        return formattedGregorian;
+      }
+      return `${formattedGregorian}<br />${formattedShamsi}`;
     }
     islamic_make_picker() {
       $(this.$ismInput).removeAttr("readonly");
@@ -2891,21 +2958,17 @@
       } else if (this.df.fieldtype === "Datetime") {
         dateType = TYPE_DATETIME;
       }
-      if (!this.can_write()) {
-        this.$wrapper.find(".islamic_date-conversion").html("&nbsp;");
-        return;
-      }
       if (!value2) {
         this.$wrapper.find(".islamic_date-conversion").html("&nbsp;");
+      } else if (!this.can_write()) {
+        this.$wrapper.find(".islamic_date-conversion").html("&nbsp;");
+      } else if (this.datepicker_ism) {
+        this.$wrapper.find(".islamic_date-conversion").html(this.format_for_input(value2));
       } else {
-        if (this.datepicker_ism) {
-          this.$wrapper.find(".islamic_date-conversion").html(this.format_for_input(value2));
-        } else {
-          const selectedDate = moment(value2, this.date_format);
-          this.$wrapper.find(".islamic_date-conversion").html(
-            ad2ism(selectedDate, dateType, ISM_DATE_FORMAT_USER)
-          );
-        }
+        const selectedDate = getParsedMoment(value2);
+        this.$wrapper.find(".islamic_date-conversion").html(
+          ad2ism(selectedDate, dateType, ISM_DATE_FORMAT_USER)
+        );
       }
     }
     set_formatted_input(value2) {
@@ -2916,17 +2979,19 @@
       } else {
         this.$ismInput.val("");
       }
+      if (!this.can_write()) {
+        this._setReadOnlyDisplayValue();
+      }
       this._printDateConversion();
       return spset;
     }
     refresh() {
       super.refresh();
-      this._printDateConversion();
+      this._toggleDatepicker();
       if (!this.can_write()) {
-        this.$wrapper.find(".ism_switch_btn").css("display", "none");
-      } else {
-        this.$wrapper.find(".ism_switch_btn").css("display", "block");
+        this._setReadOnlyDisplayValue();
       }
+      this._printDateConversion();
     }
   };
   function ReportFormatFormDate(value2) {
