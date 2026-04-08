@@ -92,8 +92,8 @@ frappe.ui.form.ControlDate = class CustomControlDate extends frappe.ui.form.Cont
     }
     bind_events() {
         this.$wrapper.on('click', '.isd_switch_btn', (ev) => {
-                event.preventDefault();
-                event.stopPropagation();
+                ev.preventDefault();
+                ev.stopPropagation();
                 this.datepicker_ism = !this.datepicker_ism;
                 this._toggleDatepicker();
         });
@@ -103,8 +103,7 @@ frappe.ui.form.ControlDate = class CustomControlDate extends frappe.ui.form.Cont
 
         const $controlValue = this.$wrapper.find('.control-value');
         if (!this.can_write()) {
-            const value = this.get_value();
-            $controlValue.html(value ? this.format_for_input(value) : '&nbsp;').show();
+            this._setReadOnlyDisplayValue($controlValue);
             this.$input.addClass('hide');
             this.$ismInput.addClass('hide');
             this.$wrapper.find('.isd_switch_btn').hide();
@@ -123,6 +122,16 @@ frappe.ui.form.ControlDate = class CustomControlDate extends frappe.ui.form.Cont
             this.$ismInput.addClass('hide');
         }
         this._printDateConversion();
+    }
+    _setReadOnlyDisplayValue($controlValue = this.$wrapper.find('.control-value')) {
+        $controlValue.html(this._getReadOnlyDisplayValue()).show();
+    }
+    _getReadOnlyDisplayValue() {
+        const value = this.get_value();
+        if (!value) {
+            return '&nbsp;';
+        }
+        return this.format_for_input(value) || '&nbsp;';
     }
     islamic_make_picker(){
         $(this.$ismInput).removeAttr('readonly');
@@ -209,11 +218,17 @@ frappe.ui.form.ControlDate = class CustomControlDate extends frappe.ui.form.Cont
         } else {
             this.$ismInput.val('');
         }
+        if (!this.can_write()) {
+            this._setReadOnlyDisplayValue();
+        }
         this._printDateConversion();
         return spset;
     }
     refresh() {
         super.refresh();
+        if (!this.can_write()) {
+            this._setReadOnlyDisplayValue();
+        }
         this._printDateConversion();
         if (!this.can_write()) {
             this.$wrapper.find('.isd_switch_btn').css('display', 'none');
@@ -258,8 +273,8 @@ frappe.ui.form.ControlDatetime = class CustomControlDateDate extends frappe.ui.f
     }
     bind_events() {
         this.$wrapper.on('click', '.isd_switch_btn', (ev) => {
-                event.preventDefault();
-                event.stopPropagation();
+                ev.preventDefault();
+                ev.stopPropagation();
                 this.datepicker_ism = !this.datepicker_ism;
                 this._toggleDatepicker();
         });
@@ -269,8 +284,7 @@ frappe.ui.form.ControlDatetime = class CustomControlDateDate extends frappe.ui.f
 
         const $controlValue = this.$wrapper.find('.control-value');
         if (!this.can_write()) {
-            const value = this.get_value();
-            $controlValue.html(value ? this.format_for_input(value) : '&nbsp;').show();
+            this._setReadOnlyDisplayValue($controlValue);
             this.$input.addClass('hide');
             this.$ismInput.addClass('hide');
             this.$wrapper.find('.isd_switch_btn').hide();
@@ -289,6 +303,16 @@ frappe.ui.form.ControlDatetime = class CustomControlDateDate extends frappe.ui.f
             this.$ismInput.addClass('hide');
         }
         this._printDateConversion();
+    }
+    _setReadOnlyDisplayValue($controlValue = this.$wrapper.find('.control-value')) {
+        $controlValue.html(this._getReadOnlyDisplayValue()).show();
+    }
+    _getReadOnlyDisplayValue() {
+        const value = this.get_value();
+        if (!value) {
+            return '&nbsp;';
+        }
+        return this.format_for_input(value) || '&nbsp;';
     }
     islamic_make_picker(){
         $(this.$ismInput).removeAttr('readonly');
@@ -375,11 +399,17 @@ frappe.ui.form.ControlDatetime = class CustomControlDateDate extends frappe.ui.f
         } else {
             this.$ismInput.val('');
         }
+        if (!this.can_write()) {
+            this._setReadOnlyDisplayValue();
+        }
         this._printDateConversion();
         return spset;
     }
     refresh() {
         super.refresh();
+        if (!this.can_write()) {
+            this._setReadOnlyDisplayValue();
+        }
         this._printDateConversion();
         if (!this.can_write()) {
             this.$wrapper.find('.isd_switch_btn').css('display', 'none');
