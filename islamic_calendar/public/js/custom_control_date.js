@@ -30,6 +30,14 @@ function ad2ism_date(m, type = TYPE_DATE) {
 
     return getISMCalendar().fromJSDate(adDate);
 }
+
+function getParsedMoment(value) {
+    const parsedFromFrappe = moment(frappe.datetime.str_to_obj(value));
+    if (parsedFromFrappe.isValid()) {
+        return parsedFromFrappe;
+    }
+    return moment(value);
+}
 function FormatFormDate(value) {
     frappe.datetime.str_to_user = datetime_str_to_user;
     const formatted = frappeDateFormatter(value);
@@ -199,7 +207,7 @@ frappe.ui.form.ControlDate = class CustomControlDate extends frappe.ui.form.Cont
                 if (this.datepicker_ism) {
                     this.$wrapper.find('.islamic_date-conversion').html(this.format_for_input(value));
                 } else {
-                    const selectedDate = moment(value, this.date_format);
+                    const selectedDate = getParsedMoment(value);
 
                     this.$wrapper.find('.islamic_date-conversion').html(
                         ad2ism(selectedDate, dateType, ISM_DATE_FORMAT_USER)
@@ -377,7 +385,7 @@ frappe.ui.form.ControlDatetime = class CustomControlDateDate extends frappe.ui.f
                 if (this.datepicker_ism) {
                     this.$wrapper.find('.islamic_date-conversion').html(this.format_for_input(value));
                 } else {
-                    const selectedDate = moment(value, this.date_format);
+                    const selectedDate = getParsedMoment(value);
 
                     this.$wrapper.find('.islamic_date-conversion').html(
                         ad2ism(selectedDate, dateType, ISM_DATE_FORMAT_USER)
