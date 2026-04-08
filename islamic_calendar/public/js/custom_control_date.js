@@ -100,6 +100,21 @@ frappe.ui.form.ControlDate = class CustomControlDate extends frappe.ui.form.Cont
     }
     _toggleDatepicker(){
         if (!this.$ismInput || !this.$ismInput.length) { return; }
+
+        const $controlValue = this.$wrapper.find('.control-value');
+        if (!this.can_write()) {
+            const value = this.get_value();
+            $controlValue.html(value ? this.format_for_input(value) : '&nbsp;').show();
+            this.$input.addClass('hide');
+            this.$ismInput.addClass('hide');
+            this.$wrapper.find('.isd_switch_btn').hide();
+            this._printDateConversion();
+            return;
+        }
+
+        $controlValue.hide();
+        this.$wrapper.find('.isd_switch_btn').show();
+
         if (this.datepicker_ism === true) {
             this.$ismInput.removeClass('hide');
             this.$input.addClass('hide');
@@ -201,9 +216,9 @@ frappe.ui.form.ControlDate = class CustomControlDate extends frappe.ui.form.Cont
         super.refresh();
         this._printDateConversion();
         if (!this.can_write()) {
-            this.$wrapper.find('.ism_switch_btn').css('display', 'none');
+            this.$wrapper.find('.isd_switch_btn').css('display', 'none');
         } else {
-            this.$wrapper.find('.ism_switch_btn').css('display', 'block');
+            this.$wrapper.find('.isd_switch_btn').css('display', 'block');
         }
     }
 }
@@ -251,6 +266,21 @@ frappe.ui.form.ControlDatetime = class CustomControlDateDate extends frappe.ui.f
     }
     _toggleDatepicker(){
         if (!this.$ismInput || !this.$ismInput.length) { return; }
+
+        const $controlValue = this.$wrapper.find('.control-value');
+        if (!this.can_write()) {
+            const value = this.get_value();
+            $controlValue.html(value ? this.format_for_input(value) : '&nbsp;').show();
+            this.$input.addClass('hide');
+            this.$ismInput.addClass('hide');
+            this.$wrapper.find('.isd_switch_btn').hide();
+            this._printDateConversion();
+            return;
+        }
+
+        $controlValue.hide();
+        this.$wrapper.find('.isd_switch_btn').show();
+
         if (this.datepicker_ism === true) {
             this.$ismInput.removeClass('hide');
             this.$input.addClass('hide');
@@ -352,9 +382,9 @@ frappe.ui.form.ControlDatetime = class CustomControlDateDate extends frappe.ui.f
         super.refresh();
         this._printDateConversion();
         if (!this.can_write()) {
-            this.$wrapper.find('.ism_switch_btn').css('display', 'none');
+            this.$wrapper.find('.isd_switch_btn').css('display', 'none');
         } else {
-            this.$wrapper.find('.ism_switch_btn').css('display', 'block');
+            this.$wrapper.find('.isd_switch_btn').css('display', 'block');
         }
     }
 }
