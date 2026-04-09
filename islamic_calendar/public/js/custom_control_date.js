@@ -202,7 +202,10 @@ frappe.ui.form.ControlDate = class CustomControlDate extends frappe.ui.form.Cont
             if (!value) {
                 this.$wrapper.find('.islamic_date-conversion').html('&nbsp;');
             } else if (!this.can_write()) {
-                this.$wrapper.find('.islamic_date-conversion').html(this.format_for_input(value));
+                const selectedDate = getParsedMoment(value);
+                this.$wrapper.find('.islamic_date-conversion').html(
+                    ad2ism(selectedDate, dateType, ISM_DATE_FORMAT_USER) || '&nbsp;'
+                );
             } else {
                 if (this.datepicker_ism) {
                     this.$wrapper.find('.islamic_date-conversion').html(this.format_for_input(value));
@@ -380,7 +383,10 @@ frappe.ui.form.ControlDatetime = class CustomControlDateDate extends frappe.ui.f
             if (!value) {
                 this.$wrapper.find('.islamic_date-conversion').html('&nbsp;');
             } else if (!this.can_write()) {
-                this.$wrapper.find('.islamic_date-conversion').html(this.format_for_input(value));
+                const selectedDate = getParsedMoment(value);
+                this.$wrapper.find('.islamic_date-conversion').html(
+                    ad2ism(selectedDate, dateType, ISM_DATE_FORMAT_USER) || '&nbsp;'
+                );
             } else {
                 if (this.datepicker_ism) {
                     this.$wrapper.find('.islamic_date-conversion').html(this.format_for_input(value));
