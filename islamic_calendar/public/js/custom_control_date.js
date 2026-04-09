@@ -6,6 +6,66 @@ const ISM_DATE_FORMAT_USER = frappe.boot['islamic_date_format'] || 'mm-dd-yyyy';
 const datetime_str_to_user = frappe.datetime.str_to_user;
 const frappeDateFormatter = frappe.form.formatters.Date;
 const frappeDatetimeFormatter = frappe.form.formatters.Datetime;
+const ISLAMIC_PICKER_RENDERER = {
+    picker: '<div class="calendars islamic-datepicker-skin">' +
+        '<div class="calendars-nav">{link:prev}{link:next}{link:prevJump}{link:nextJump}</div>{months}' +
+        '{popup:start}<div class="calendars-ctrl">{link:clear}{link:today}</div>{popup:end}' +
+        '<div class="calendars-clear-fix"></div></div>',
+    monthRow: '<div class="calendars-month-row">{months}</div>',
+    month: '<div class="calendars-month"><table><thead>{weekHeader}</thead><tbody>{weeks}</tbody></table></div>',
+    weekHeader: '<tr>{days}</tr>',
+    dayHeader: '<th>{day}</th>',
+    week: '<tr>{days}</tr>',
+    day: '<td>{day}</td>',
+    monthSelector: '.calendars-month',
+    daySelector: 'td',
+    rtlClass: 'calendars-rtl',
+    multiClass: 'calendars-multi',
+    defaultClass: '',
+    selectedClass: 'calendars-selected',
+    highlightedClass: 'calendars-highlight',
+    todayClass: 'calendars-today',
+    otherMonthClass: 'calendars-other-month',
+    weekendClass: 'calendars-weekend',
+    commandClass: 'calendars-cmd',
+    commandButtonClass: '',
+    commandLinkClass: '',
+    disabledClass: 'calendars-disabled'
+};
+
+function getIslamicPickerRenderer() {
+    const fallbackRenderer = {
+        monthRow: '<div class="calendars-month-row">{months}</div>',
+        month: '<div class="calendars-month"><div class="calendars-month-header">{monthHeader}</div>' +
+            '<table><thead>{weekHeader}</thead><tbody>{weeks}</tbody></table></div>',
+        weekHeader: '<tr>{days}</tr>',
+        dayHeader: '<th>{day}</th>',
+        week: '<tr>{days}</tr>',
+        day: '<td>{day}</td>',
+        monthSelector: '.calendars-month',
+        daySelector: 'td',
+        rtlClass: 'calendars-rtl',
+        multiClass: 'calendars-multi',
+        defaultClass: '',
+        selectedClass: 'calendars-selected',
+        highlightedClass: 'calendars-highlight',
+        todayClass: 'calendars-today',
+        otherMonthClass: 'calendars-other-month',
+        weekendClass: 'calendars-weekend',
+        commandClass: 'calendars-cmd',
+        commandButtonClass: '',
+        commandLinkClass: '',
+        disabledClass: 'calendars-disabled'
+    };
+    const baseRenderer = ($.calendarsPicker && $.calendarsPicker.defaultRenderer) || fallbackRenderer;
+
+    return Object.assign({}, baseRenderer, {
+        picker: '<div class="calendars islamic-datepicker-skin">' +
+            '<div class="calendars-nav">{link:prev}{link:prevJump}{link:nextJump}{link:next}</div>{months}' +
+            '{popup:start}<div class="calendars-ctrl">{link:clear}{link:today}</div>{popup:end}' +
+            '<div class="calendars-clear-fix"></div></div>'
+    });
+}
 
 function getISMCalendar() {
         return $.calendars.instance('iranian', 'en_US');
@@ -171,6 +231,7 @@ frappe.ui.form.ControlDate = class CustomControlDate extends frappe.ui.form.Cont
         this.$ismInput.calendarsPicker({
             calendar: getISMCalendar(),
             dateFormat: ISM_DATE_FORMAT,
+            renderer: ISLAMIC_PICKER_RENDERER,
             prevText: 'Prev',
             nextText: 'Next',
             todayText: 'Today',
@@ -178,8 +239,6 @@ frappe.ui.form.ControlDate = class CustomControlDate extends frappe.ui.form.Cont
             closeText: 'Close',
             onShow: function(picker) {
                 $(picker).addClass('islamic_datepicker_popup');
-                const currentDate = syncISMInputFromControl(this) || getISMCalendar().today();
-                this.$ismInput.calendarsPicker('setDate', currentDate);
                 $(picker).find('.calendars-cmd-today').on('click', function() {
                     const today = getISMCalendar().today();
                     this.$ismInput.calendarsPicker('setDate', today);
@@ -355,6 +414,7 @@ frappe.ui.form.ControlDatetime = class CustomControlDateDate extends frappe.ui.f
         this.$ismInput.calendarsPicker({
             calendar: getISMCalendar(),
             dateFormat: ISM_DATE_FORMAT,
+            renderer: ISLAMIC_PICKER_RENDERER,
             prevText: 'Prev',
             nextText: 'Next',
             todayText: 'Today',
@@ -362,8 +422,6 @@ frappe.ui.form.ControlDatetime = class CustomControlDateDate extends frappe.ui.f
             closeText: 'Close',
             onShow: function(picker) {
                 $(picker).addClass('islamic_datepicker_popup');
-                const currentDate = syncISMInputFromControl(this) || getISMCalendar().today();
-                this.$ismInput.calendarsPicker('setDate', currentDate);
                 $(picker).find('.calendars-cmd-today').on('click', function() {
                     const today = getISMCalendar().today();
                     this.$ismInput.calendarsPicker('setDate', today);
