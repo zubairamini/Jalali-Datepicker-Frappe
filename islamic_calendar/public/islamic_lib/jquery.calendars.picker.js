@@ -1766,7 +1766,9 @@ $(selector).datepick('setDate', [date1, date2, date3]) */
 				weeks += this._prepare(renderer.week, inst).replace(/\{days\}/g, days).
 					replace(/\{weekOfYear\}/g, weekOfYear);
 			}
-			var monthHeader = this._prepare(renderer.month, inst).match(/\{monthHeader(:[^\}]+)?\}/);
+			var monthTemplate = this._prepare(renderer.month || '', inst);
+			var monthHeader = monthTemplate.match(/\{monthHeader(:[^\}]+)?\}/);
+			monthHeader = monthHeader || ['{monthHeader:MM yyyy}'];
 			monthHeader = (monthHeader[0].length <= 13 ? 'MM yyyy' :
 				monthHeader[0].substring(13, monthHeader[0].length - 1));
 			monthHeader = (first ? this._generateMonthSelection(
@@ -1775,7 +1777,7 @@ $(selector).datepick('setDate', [date1, date2, date3]) */
 					{localNumbers: inst.options.localNumbers}));
 			var weekHeader = this._prepare(renderer.weekHeader, inst).
 				replace(/\{days\}/g, this._generateDayHeaders(inst, calendar, renderer));
-			return this._prepare(renderer.month, inst).replace(/\{monthHeader(:[^\}]+)?\}/g, monthHeader).
+			return monthTemplate.replace(/\{monthHeader(:[^\}]+)?\}/g, monthHeader).
 				replace(/\{weekHeader\}/g, weekHeader).replace(/\{weeks\}/g, weeks);
 		},
 

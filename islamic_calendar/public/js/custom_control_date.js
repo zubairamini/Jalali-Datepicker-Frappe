@@ -38,6 +38,28 @@ function getParsedMoment(value) {
     }
     return moment(value);
 }
+
+function getSafeISMDateFromValue(value, fieldtype = 'Date') {
+    if (!value) { return null; }
+    const parsed = getParsedMoment(value);
+    if (!parsed || !parsed.isValid()) { return null; }
+    const dateType = fieldtype === 'Datetime' ? TYPE_DATETIME : TYPE_DATE;
+    try {
+        return ad2ism_date(parsed, dateType);
+    } catch (e) {
+        return null;
+    }
+}
+
+function syncISMInputFromControl(control) {
+    const cdate = getSafeISMDateFromValue(control.get_value(), control.df.fieldtype);
+    if (cdate) {
+        control.$ismInput.val(cdate.formatDate(ISM_DATE_FORMAT));
+    } else {
+        control.$ismInput.val('');
+    }
+    return cdate;
+}
 function FormatFormDate(value) {
     frappe.datetime.str_to_user = datetime_str_to_user;
     const formatted = frappeDateFormatter(value);
@@ -144,6 +166,7 @@ frappe.ui.form.ControlDate = class CustomControlDate extends frappe.ui.form.Cont
     islamic_make_picker(){
         $(this.$ismInput).removeAttr('readonly');
         this.$input.after(this.$ismInput);
+        syncISMInputFromControl(this);
         this.$ismInput.calendarsPicker('destroy');
         this.$ismInput.calendarsPicker({
             calendar: getISMCalendar(),
@@ -154,9 +177,11 @@ frappe.ui.form.ControlDate = class CustomControlDate extends frappe.ui.form.Cont
             clearText: 'Clear',
             closeText: 'Close',
             onShow: function(picker) {
+                $(picker).addClass('islamic_datepicker_popup');
+                const currentDate = syncISMInputFromControl(this) || getISMCalendar().today();
+                this.$ismInput.calendarsPicker('setDate', currentDate);
                 $(picker).find('.calendars-cmd-today').on('click', function() {
-                    const calendar = $.calendars.instance('islamic', 'en_US');
-                    const today = calendar.newDate();
+                    const today = getISMCalendar().today();
                     this.$ismInput.calendarsPicker('setDate', today);
                 }.bind(this));
             }.bind(this),
@@ -325,6 +350,7 @@ frappe.ui.form.ControlDatetime = class CustomControlDateDate extends frappe.ui.f
     islamic_make_picker(){
         $(this.$ismInput).removeAttr('readonly');
         this.$input.after(this.$ismInput);
+        syncISMInputFromControl(this);
         this.$ismInput.calendarsPicker('destroy');
         this.$ismInput.calendarsPicker({
             calendar: getISMCalendar(),
@@ -332,12 +358,14 @@ frappe.ui.form.ControlDatetime = class CustomControlDateDate extends frappe.ui.f
             prevText: 'Prev',
             nextText: 'Next',
             todayText: 'Today',
-            i: 'Clear',
+            clearText: 'Clear',
             closeText: 'Close',
             onShow: function(picker) {
+                $(picker).addClass('islamic_datepicker_popup');
+                const currentDate = syncISMInputFromControl(this) || getISMCalendar().today();
+                this.$ismInput.calendarsPicker('setDate', currentDate);
                 $(picker).find('.calendars-cmd-today').on('click', function() {
-                    const calendar = $.calendars.instance('islamic', 'en_US');
-                    const today = calendar.newDate();
+                    const today = getISMCalendar().today();
                     this.$ismInput.calendarsPicker('setDate', today);
                 }.bind(this));
             }.bind(this),
