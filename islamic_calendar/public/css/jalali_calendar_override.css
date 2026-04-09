@@ -12,8 +12,9 @@
 	--jdp-shadow: 0 14px 40px rgba(64, 104, 176, 0.16);
 }
 
-.calendars.islamic_datepicker_popup,
-.calendars-popup.islamic_datepicker_popup {
+.calendars.islamic-datepicker-skin.islamic_datepicker_popup,
+.calendars-popup.islamic-datepicker-skin,
+.calendars-popup.islamic-datepicker-skin.islamic_datepicker_popup {
 	direction: rtl;
 	width: 360px !important;
 	border: 1px solid var(--jdp-border);
@@ -25,7 +26,7 @@
 	overflow: hidden;
 }
 
-.calendars.islamic_datepicker_popup .calendars-nav {
+.calendars.islamic-datepicker-skin .calendars-nav {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -36,7 +37,7 @@
 	border-bottom: 1px solid var(--jdp-soft-border);
 }
 
-.calendars.islamic_datepicker_popup .calendars-nav .calendars-cmd {
+.calendars.islamic-datepicker-skin .calendars-nav .calendars-cmd {
 	float: none;
 	width: 50px;
 	height: 50px;
@@ -54,37 +55,37 @@
 	transition: all 0.2s ease;
 }
 
-.calendars.islamic_datepicker_popup .calendars-nav .calendars-cmd:hover {
+.calendars.islamic-datepicker-skin .calendars-nav .calendars-cmd:hover {
 	border-color: #bfc6d3;
 	background: #f5f7fb;
 	color: #606a79;
 }
 
-.calendars.islamic_datepicker_popup .calendars-nav .calendars-cmd-prev::before,
-.calendars.islamic_datepicker_popup .calendars-nav .calendars-cmd-prevJump::before {
+.calendars.islamic-datepicker-skin .calendars-nav .calendars-cmd-prev::before,
+.calendars.islamic-datepicker-skin .calendars-nav .calendars-cmd-prevJump::before {
 	content: "−";
 	font-size: 38px;
 	margin-top: -8px;
 }
 
-.calendars.islamic_datepicker_popup .calendars-nav .calendars-cmd-next::before,
-.calendars.islamic_datepicker_popup .calendars-nav .calendars-cmd-nextJump::before {
+.calendars.islamic-datepicker-skin .calendars-nav .calendars-cmd-next::before,
+.calendars.islamic-datepicker-skin .calendars-nav .calendars-cmd-nextJump::before {
 	content: "+";
 	font-size: 40px;
 	margin-top: -8px;
 }
 
-.calendars.islamic_datepicker_popup .calendars-nav .calendars-cmd-prevJump,
-.calendars.islamic_datepicker_popup .calendars-nav .calendars-cmd-nextJump {
+.calendars.islamic-datepicker-skin .calendars-nav .calendars-cmd-prevJump,
+.calendars.islamic-datepicker-skin .calendars-nav .calendars-cmd-nextJump {
 	order: 1;
 }
 
-.calendars.islamic_datepicker_popup .calendars-nav .calendars-cmd-prev,
-.calendars.islamic_datepicker_popup .calendars-nav .calendars-cmd-next {
+.calendars.islamic-datepicker-skin .calendars-nav .calendars-cmd-prev,
+.calendars.islamic-datepicker-skin .calendars-nav .calendars-cmd-next {
 	order: 3;
 }
 
-.calendars.islamic_datepicker_popup .calendars-month-header {
+.calendars.islamic-datepicker-skin .calendars-month-header {
 	position: absolute;
 	inset: 24px 124px auto 124px;
 	display: inline-flex;
@@ -101,8 +102,8 @@
 	pointer-events: none;
 }
 
-.calendars.islamic_datepicker_popup .calendars-month-header select,
-.calendars.islamic_datepicker_popup .calendars-month-header input {
+.calendars.islamic-datepicker-skin .calendars-month-header select,
+.calendars.islamic-datepicker-skin .calendars-month-header input {
 	display: inline-flex !important;
 	position: static;
 	height: auto;
@@ -119,7 +120,7 @@
 	pointer-events: auto;
 }
 
-.calendars.islamic_datepicker_popup .calendars-month-header select {
+.calendars.islamic-datepicker-skin .calendars-month-header select {
 	padding-inline-start: 18px;
 	background-image: linear-gradient(45deg, transparent 50%, #1f2937 50%),
 		linear-gradient(135deg, #1f2937 50%, transparent 50%);
@@ -129,7 +130,7 @@
 	cursor: pointer;
 }
 
-.calendars.islamic_datepicker_popup .calendars-month {
+.calendars.islamic-datepicker-skin .calendars-month {
 	width: auto;
 	float: none;
 	border: 0;
@@ -137,18 +138,18 @@
 	position: relative;
 }
 
-.calendars.islamic_datepicker_popup .calendars-month table {
+.calendars.islamic-datepicker-skin .calendars-month table {
 	border-collapse: separate;
 	border-spacing: 6px 10px;
 	width: calc(100% - 20px);
 	margin: 84px auto 0;
 }
 
-.calendars.islamic_datepicker_popup .calendars-month thead {
+.calendars.islamic-datepicker-skin .calendars-month thead {
 	border: 0;
 }
 
-.calendars.islamic_datepicker_popup .calendars-month th {
+.calendars.islamic-datepicker-skin .calendars-month th {
 	border: 0;
 	background: var(--jdp-weekday-bg);
 	color: #4b5a73;
@@ -157,16 +158,16 @@
 	padding: 11px 4px 10px;
 }
 
-.calendars.islamic_datepicker_popup .calendars-month th:first-child {
+.calendars.islamic-datepicker-skin .calendars-month th:first-child {
 	border-radius: 10px 0 0 10px;
 	color: #db5c5a;
 }
 
-.calendars.islamic_datepicker_popup .calendars-month th:last-child {
+.calendars.islamic-datepicker-skin .calendars-month th:last-child {
 	border-radius: 0 10px 10px 0;
 }
 
-.calendars.islamic_datepicker_popup .calendars-month td {
+.calendars.islamic-datepicker-skin .calendars-month td {
 	border: 0;
 	background: transparent;
 	padding: 0;
@@ -175,8 +176,8 @@
 	height: 52px;
 }
 
-.calendars.islamic_datepicker_popup .calendars-month td a,
-.calendars.islamic_datepicker_popup .calendars-month td span {
+.calendars.islamic-datepicker-skin .calendars-month td a,
+.calendars.islamic-datepicker-skin .calendars-month td span {
 	width: 100%;
 	height: 52px;
 	border-radius: 16px;
@@ -189,32 +190,32 @@
 	transition: all 0.2s ease;
 }
 
-.calendars.islamic_datepicker_popup .calendars-month td .calendars-weekend {
+.calendars.islamic-datepicker-skin .calendars-month td .calendars-weekend {
 	color: #da6660;
 }
 
-.calendars.islamic_datepicker_popup .calendars-month td a:hover {
+.calendars.islamic-datepicker-skin .calendars-month td a:hover {
 	background: #ebf1ff;
 	color: #3f5a8f;
 }
 
-.calendars.islamic_datepicker_popup .calendars-month td .calendars-selected {
+.calendars.islamic-datepicker-skin .calendars-month td .calendars-selected {
 	background: var(--jdp-primary);
 	color: #fff;
 	box-shadow: 0 8px 16px rgba(95, 143, 230, 0.34);
 }
 
-.calendars.islamic_datepicker_popup .calendars-month td .calendars-today {
+.calendars.islamic-datepicker-skin .calendars-month td .calendars-today {
 	border: 2px solid #c8ccd4;
 	color: #5b6470;
 	background: #fff;
 }
 
-.calendars.islamic_datepicker_popup .calendars-month td .calendars-other-month {
+.calendars.islamic-datepicker-skin .calendars-month td .calendars-other-month {
 	opacity: 0.08;
 }
 
-.calendars.islamic_datepicker_popup .calendars-ctrl {
+.calendars.islamic-datepicker-skin .calendars-ctrl {
 	float: none;
 	display: flex;
 	justify-content: space-between;
@@ -223,7 +224,7 @@
 	padding: 6px 16px 18px;
 }
 
-.calendars.islamic_datepicker_popup .calendars-ctrl .calendars-cmd {
+.calendars.islamic-datepicker-skin .calendars-ctrl .calendars-cmd {
 	float: none;
 	width: auto;
 	min-width: 112px;
@@ -241,11 +242,11 @@
 	transition: all 0.2s ease;
 }
 
-.calendars.islamic_datepicker_popup .calendars-ctrl .calendars-cmd:hover {
+.calendars.islamic-datepicker-skin .calendars-ctrl .calendars-cmd:hover {
 	background: var(--jdp-primary-hover);
 }
 
-.calendars.islamic_datepicker_popup .calendars-cmd.calendars-disabled {
+.calendars.islamic-datepicker-skin .calendars-cmd.calendars-disabled {
 	opacity: 0.45;
 	pointer-events: none;
 }
