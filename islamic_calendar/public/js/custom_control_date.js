@@ -6,12 +6,32 @@ const ISM_DATE_FORMAT_USER = frappe.boot['islamic_date_format'] || 'mm-dd-yyyy';
 const datetime_str_to_user = frappe.datetime.str_to_user;
 const frappeDateFormatter = frappe.form.formatters.Date;
 const frappeDatetimeFormatter = frappe.form.formatters.Datetime;
-const ISLAMIC_PICKER_RENDERER = Object.assign({}, $.calendarsPicker.defaultRenderer, {
+const ISLAMIC_PICKER_RENDERER = {
     picker: '<div class="calendars islamic-datepicker-skin">' +
-        '<div class="calendars-nav">{link:prev}{link:prevJump}{link:nextJump}{link:next}</div>{months}' +
+        '<div class="calendars-nav">{link:prev}{link:next}{link:prevJump}{link:nextJump}</div>{months}' +
         '{popup:start}<div class="calendars-ctrl">{link:clear}{link:today}</div>{popup:end}' +
-        '<div class="calendars-clear-fix"></div></div>'
-});
+        '<div class="calendars-clear-fix"></div></div>',
+    monthRow: '<div class="calendars-month-row">{months}</div>',
+    month: '<div class="calendars-month"><table><thead>{weekHeader}</thead><tbody>{weeks}</tbody></table></div>',
+    weekHeader: '<tr>{days}</tr>',
+    dayHeader: '<th>{day}</th>',
+    week: '<tr>{days}</tr>',
+    day: '<td>{day}</td>',
+    monthSelector: '.calendars-month',
+    daySelector: 'td',
+    rtlClass: 'calendars-rtl',
+    multiClass: 'calendars-multi',
+    defaultClass: '',
+    selectedClass: 'calendars-selected',
+    highlightedClass: 'calendars-highlight',
+    todayClass: 'calendars-today',
+    otherMonthClass: 'calendars-other-month',
+    weekendClass: 'calendars-weekend',
+    commandClass: 'calendars-cmd',
+    commandButtonClass: '',
+    commandLinkClass: '',
+    disabledClass: 'calendars-disabled'
+};
 
 function getISMCalendar() {
         return $.calendars.instance('iranian', 'en_US');
