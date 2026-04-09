@@ -33,6 +33,40 @@ const ISLAMIC_PICKER_RENDERER = {
     disabledClass: 'calendars-disabled'
 };
 
+function getIslamicPickerRenderer() {
+    const fallbackRenderer = {
+        monthRow: '<div class="calendars-month-row">{months}</div>',
+        month: '<div class="calendars-month"><div class="calendars-month-header">{monthHeader}</div>' +
+            '<table><thead>{weekHeader}</thead><tbody>{weeks}</tbody></table></div>',
+        weekHeader: '<tr>{days}</tr>',
+        dayHeader: '<th>{day}</th>',
+        week: '<tr>{days}</tr>',
+        day: '<td>{day}</td>',
+        monthSelector: '.calendars-month',
+        daySelector: 'td',
+        rtlClass: 'calendars-rtl',
+        multiClass: 'calendars-multi',
+        defaultClass: '',
+        selectedClass: 'calendars-selected',
+        highlightedClass: 'calendars-highlight',
+        todayClass: 'calendars-today',
+        otherMonthClass: 'calendars-other-month',
+        weekendClass: 'calendars-weekend',
+        commandClass: 'calendars-cmd',
+        commandButtonClass: '',
+        commandLinkClass: '',
+        disabledClass: 'calendars-disabled'
+    };
+    const baseRenderer = ($.calendarsPicker && $.calendarsPicker.defaultRenderer) || fallbackRenderer;
+
+    return Object.assign({}, baseRenderer, {
+        picker: '<div class="calendars islamic-datepicker-skin">' +
+            '<div class="calendars-nav">{link:prev}{link:prevJump}{link:nextJump}{link:next}</div>{months}' +
+            '{popup:start}<div class="calendars-ctrl">{link:clear}{link:today}</div>{popup:end}' +
+            '<div class="calendars-clear-fix"></div></div>'
+    });
+}
+
 function getISMCalendar() {
         return $.calendars.instance('iranian', 'en_US');
     }
