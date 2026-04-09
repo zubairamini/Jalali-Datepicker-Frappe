@@ -154,6 +154,7 @@ frappe.ui.form.ControlDate = class CustomControlDate extends frappe.ui.form.Cont
             clearText: 'Clear',
             closeText: 'Close',
             onShow: function(picker) {
+                $(picker).addClass('islamic_datepicker_popup');
                 $(picker).find('.calendars-cmd-today').on('click', function() {
                     const calendar = $.calendars.instance('islamic', 'en_US');
                     const today = calendar.newDate();
@@ -332,9 +333,10 @@ frappe.ui.form.ControlDatetime = class CustomControlDateDate extends frappe.ui.f
             prevText: 'Prev',
             nextText: 'Next',
             todayText: 'Today',
-            i: 'Clear',
+            clearText: 'Clear',
             closeText: 'Close',
             onShow: function(picker) {
+                $(picker).addClass('islamic_datepicker_popup');
                 $(picker).find('.calendars-cmd-today').on('click', function() {
                     const calendar = $.calendars.instance('islamic', 'en_US');
                     const today = calendar.newDate();
